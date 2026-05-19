@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TK-Rechner | ver.di</title>
+<style>
+  :root {
+    --verdi-rot: #EE7D00;
+    --verdi-rot-dark: #C96900;
+    --verdi-rot-light: #FEF1E0;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5F5F5F;
+    --text-tertiary: #8A8A8A;
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F5F5F3;
+    --bg-tertiary: #FAFAF8;
+    --border-light: rgba(0,0,0,0.08);
+    --border-medium: rgba(0,0,0,0.15);
+    --warning-bg: #FAEEDA;
+    --warning-text: #633806;
+    --pink-bg: #FBEAF0;
+    --pink-text: #72243E;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+    margin: 0;
+    padding: 0;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 20px;
+  }
+
+  .header {
+    border-bottom: 3px solid var(--verdi-rot);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: var(--text-primary);
+  }
+
+  .header .subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .step-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .input-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  input[type="number"], input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: border-color 0.15s;
+  }
+
+  input[type="number"]:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: var(--verdi-rot);
+    box-shadow: 0 0 0 3px rgba(238, 125, 0, 0.15);
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] { -moz-appearance: textfield; }
+
+  .toggle-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 500;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .toggle-btn:hover {
+    border-color: var(--verdi-rot);
+  }
+
+  .toggle-btn.active {
+    background: var(--verdi-rot);
+    color: white;
+    border-color: var(--verdi-rot);
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    font-weight: 500;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn:hover {
+    border-color: var(--verdi-rot);
+    color: var(--verdi-rot);
+  }
+
+  .btn-primary {
+    background: var(--verdi-rot);
+    color: white;
+    border-color: var(--verdi-rot);
+  }
+
+  .btn-primary:hover {
+    background: var(--verdi-rot-dark);
+    border-color: var(--verdi-rot-dark);
+    color: white;
+  }
+
+  .row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+  }
+
+  .row > * { flex: 1; }
+
+  .betrieb-row {
+    display: grid;
+    grid-template-columns: 1fr 130px 36px;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .betrieb-header {
+    display: grid;
+    grid-template-columns: 1fr 130px 36px;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 6px;
+    padding: 0 2px;
+  }
+
+  .icon-btn {
+    background: transparent;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    width: 36px;
+    height: 38px;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+  }
+
+  .icon-btn:hover {
+    border-color: #C92020;
+    color: #C92020;
+  }
+
+  .icon-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: 20px 0;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .stat {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.1;
+  }
+
+  .stat-sub {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+  }
+
+  .stat-highlight {
+    background: var(--verdi-rot-light);
+  }
+
+  .stat-highlight .stat-value {
+    color: var(--verdi-rot-dark);
+  }
+
+  .section-title {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 20px 0 10px;
+  }
+
+  .betrieb-result-table {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .betrieb-result-row {
+    display: grid;
+    grid-template-columns: 1fr 80px 100px;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-light);
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .betrieb-result-row:last-child { border-bottom: none; }
+
+  .betrieb-result-row.header {
+    background: var(--bg-secondary);
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .betrieb-name { font-weight: 500; }
+  .betrieb-mitglieder { font-size: 12px; color: var(--text-tertiary); font-weight: 400; }
+
+  .pill {
+    display: inline-block;
+    background: var(--verdi-rot-light);
+    color: var(--verdi-rot-dark);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  .pill-pink {
+    background: var(--pink-bg);
+    color: var(--pink-text);
+  }
+
+  .pill-amber {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+  }
+
+  .warning {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    margin: 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hint {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin: 6px 0 0;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+    padding: 24px;
+  }
+
+  .footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light);
+    font-size: 12px;
+    color: var(--text-tertiary);
+    text-align: center;
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 520px) {
+    .container { padding: 16px 12px; }
+    .row { flex-direction: column; align-items: stretch; }
+    .betrieb-row, .betrieb-header { grid-template-columns: 1fr 100px 36px; }
+    .betrieb-result-row { grid-template-columns: 1fr 60px 70px; font-size: 13px; }
+  }
+
+  @media print {
+    body { background: white; }
+    .no-print { display: none !important; }
+    .card { border: 1px solid #ccc; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Rechner zur Zusammensetzung der Tarifkommission</h1>
+    <p class="subtitle">ver.di · Landesbezirk · TK-Mandate nach Staffelung mit Frauen-, U28- und Betriebsverteilung</p>
+  </div>
+
+  <div class="card">
+    <span class="step-label">1 · Art des Tarifvertrags</span>
+    <div class="toggle-group">
+      <button id="btn-htv" class="toggle-btn active" onclick="setTyp('htv')">Haustarifvertrag</button>
+      <button id="btn-ftv" class="toggle-btn" onclick="setTyp('ftv')">Flächentarifvertrag</button>
+    </div>
+  </div>
+
+  <div class="card" id="htv-block">
+    <span class="step-label">2 · Mitglieder im Betrieb</span>
+    <input type="number" id="htv-mitglieder" min="0" value="220" />
+  </div>
+
+  <div class="card" id="ftv-block" style="display:none;">
+    <span class="step-label">2 · Betriebe im Tarifgebiet</span>
+    <div class="betrieb-header">
+      <span>Betriebsname</span>
+      <span>Mitglieder</span>
+      <span></span>
+    </div>
+    <div id="betriebe-list"></div>
+    <button class="btn" onclick="addBetrieb()" style="margin-top: 12px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Betrieb hinzufügen
+    </button>
+  </div>
+
+  <div class="card">
+    <span class="step-label">3 · Frauen- und U28-Anteil (gesamtes Tarifgebiet)</span>
+    <div class="row">
+      <div>
+        <label class="input-label" for="frauen">Frauen (absolute Mitgliederzahl)</label>
+        <input type="number" id="frauen" min="0" value="0" />
+      </div>
+      <div>
+        <label class="input-label" for="u28">U28 (absolute Mitgliederzahl)</label>
+        <input type="number" id="u28" min="0" value="0" />
+      </div>
+    </div>
+    <p class="hint">Anteile werden automatisch aus den absoluten Zahlen errechnet.</p>
+  </div>
+
+  <div class="card" id="ergebnis-card">
+    <span class="step-label">Ergebnis · Zusammensetzung der TK</span>
+    <div id="ergebnis"></div>
+    <div class="actions no-print">
+      <button class="btn" onclick="window.print()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Drucken / als PDF speichern
+      </button>
+      <button class="btn" onclick="resetForm()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+        Zurücksetzen
+      </button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Mandatsverteilung bei Flächentarifverträgen nach Hare-Niemeyer-Verfahren. Mindestens 1 Mandat pro Betrieb mit Mitgliedern.
+  </div>
+
+</div>
+
+<script>
+const TK_STAFFEL = [
+  { max: 100, mandate: 3, label: "bis 100" },
+  { max: 200, mandate: 5, label: "ab 101" },
+  { max: 300, mandate: 7, label: "ab 201" },
+  { max: 400, mandate: 9, label: "ab 301" },
+  { max: 500, mandate: 11, label: "ab 401" },
+  { max: Infinity, mandate: 13, label: "über 501" }
+];
+
+let typ = 'htv';
+let betriebe = [
+  { name: '', mitglieder: 0 },
+  { name: '', mitglieder: 0 }
+];
+
+function getMandate(mitglieder) {
+  for (const stufe of TK_STAFFEL) {
+    if (mitglieder <= stufe.max) return stufe.mandate;
+  }
+  return 13;
+}
+
+function setTyp(t) {
+  typ = t;
+  document.getElementById('btn-htv').classList.toggle('active', t === 'htv');
+  document.getElementById('btn-ftv').classList.toggle('active', t === 'ftv');
+  document.getElementById('htv-block').style.display = t === 'htv' ? 'block' : 'none';
+  document.getElementById('ftv-block').style.display = t === 'ftv' ? 'block' : 'none';
+  render();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderBetriebe() {
+  const list = document.getElementById('betriebe-list');
+  list.innerHTML = '';
+  betriebe.forEach((b, i) => {
+    const row = document.createElement('div');
+    row.className = 'betrieb-row';
+    row.innerHTML = `
+      <input type="text" value="${escapeHtml(b.name)}" oninput="updateBetrieb(${i}, 'name', this.value)" placeholder="z.B. NoMo" />
+      <input type="number" min="0" value="${b.mitglieder}" oninput="updateBetrieb(${i}, 'mitglieder', this.value)" />
+      <button class="icon-btn" onclick="removeBetrieb(${i})" aria-label="Entfernen" title="Entfernen">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function updateBetrieb(i, field, value) {
+  betriebe[i][field] = field === 'mitglieder' ? (parseInt(value) || 0) : value;
+  render();
+}
+
+function addBetrieb() {
+  betriebe.push({ name: '', mitglieder: 0 });
+  renderBetriebe();
+  render();
+}
+
+function removeBetrieb(i) {
+  if (betriebe.length <= 1) return;
+  betriebe.splice(i, 1);
+  renderBetriebe();
+  render();
+}
+
+function resetForm() {
+  betriebe = [{ name: '', mitglieder: 0 }, { name: '', mitglieder: 0 }];
+  document.getElementById('htv-mitglieder').value = 0;
+  document.getElementById('frauen').value = 0;
+  document.getElementById('u28').value = 0;
+  setTyp('htv');
+  renderBetriebe();
+  render();
+}
+
+// Hare-Niemeyer-Verteilung mit Mindestmandat 1 pro Betrieb mit Mitgliedern
+function verteileMandate(mandateGesamt, einheiten) {
+  const total = einheiten.reduce((s, e) => s + e.mitglieder, 0);
+  if (total === 0 || mandateGesamt === 0) {
+    return einheiten.map(e => ({ ...e, mandate: 0, anteil: 0 }));
+  }
+
+  const mitIndex = einheiten.map((e, idx) => ({ ...e, _idx: idx }));
+  const aktive = mitIndex.filter(e => e.mitglieder > 0);
+
+  if (aktive.length > mandateGesamt) {
+    // Mehr Betriebe als Mandate: die größten bekommen je 1
+    const sortiert = [...aktive].sort((a, b) => b.mitglieder - a.mitglieder);
+    const gewinner = new Set(sortiert.slice(0, mandateGesamt).map(e => e._idx));
+    return einheiten.map((e, idx) => ({
+      ...e,
+      mandate: gewinner.has(idx) ? 1 : 0,
+      anteil: total > 0 ? (e.mitglieder / total) * 100 : 0
+    }));
+  }
+
+  const reserviert = aktive.length;
+  const zuVerteilen = mandateGesamt - reserviert;
+  const aktivTotal = aktive.reduce((s, e) => s + e.mitglieder, 0);
+
+  const mitQuote = aktive.map(e => {
+    const quote = aktivTotal > 0 ? (e.mitglieder / aktivTotal) * zuVerteilen : 0;
+    return { _idx: e._idx, ganz: Math.floor(quote), rest: quote - Math.floor(quote) };
+  });
+
+  let summeGanz = mitQuote.reduce((s, e) => s + e.ganz, 0);
+  let restMandate = zuVerteilen - summeGanz;
+  const sortiertNachRest = [...mitQuote].sort((a, b) => b.rest - a.rest);
+  for (let i = 0; i < restMandate; i++) {
+    sortiertNachRest[i].ganz++;
+  }
+
+  const quoteMap = new Map(mitQuote.map(e => [e._idx, e.ganz]));
+
+  return einheiten.map((e, idx) => ({
+    ...e,
+    mandate: e.mitglieder === 0 ? 0 : 1 + (quoteMap.get(idx) || 0),
+    anteil: total > 0 ? (e.mitglieder / total) * 100 : 0
+  }));
+}
+
+function getStaffelLabel(mitglieder) {
+  for (const stufe of TK_STAFFEL) {
+    if (mitglieder <= stufe.max) return stufe.label;
+  }
+  return "über 501";
+}
+
+function render() {
+  const frauen = parseInt(document.getElementById('frauen').value) || 0;
+  const u28 = parseInt(document.getElementById('u28').value) || 0;
+
+  let mitgliederGesamt = 0;
+  if (typ === 'htv') {
+    mitgliederGesamt = parseInt(document.getElementById('htv-mitglieder').value) || 0;
+  } else {
+    mitgliederGesamt = betriebe.reduce((s, b) => s + b.mitglieder, 0);
+  }
+
+  const mandate = mitgliederGesamt > 0 ? getMandate(mitgliederGesamt) : 0;
+  const staffel = mitgliederGesamt > 0 ? getStaffelLabel(mitgliederGesamt) : "";
+
+  const frauenAnteil = mitgliederGesamt > 0 ? frauen / mitgliederGesamt : 0;
+  const u28Anteil = mitgliederGesamt > 0 ? u28 / mitgliederGesamt : 0;
+  const frauenMandate = Math.round(frauenAnteil * mandate);
+  const u28Mandate = Math.round(u28Anteil * mandate);
+
+  const ergebnis = document.getElementById('ergebnis');
+
+  if (mitgliederGesamt === 0) {
+    ergebnis.innerHTML = '<div class="empty-state">Bitte Mitgliederzahlen eingeben, um die Zusammensetzung zu berechnen.</div>';
+    return;
+  }
+
+  let warnung = '';
+  if (frauen > mitgliederGesamt || u28 > mitgliederGesamt) {
+    warnung = `<div class="warning">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      Frauen- bzw. U28-Zahl ist größer als die Gesamtmitgliedschaft. Bitte prüfen.
+    </div>`;
+  }
+
+  let html = `
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-label">Mitglieder gesamt</div>
+        <div class="stat-value">${mitgliederGesamt.toLocaleString('de-DE')}</div>
+        <div class="stat-sub">Staffel: ${staffel}</div>
+      </div>
+      <div class="stat stat-highlight">
+        <div class="stat-label">TK-Mandate</div>
+        <div class="stat-value">${mandate}</div>
+        <div class="stat-sub">nach Staffelung</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">davon Frauen</div>
+        <div class="stat-value">${frauenMandate}</div>
+        <div class="stat-sub">${(frauenAnteil * 100).toFixed(1)} % in Mitgliedschaft</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">davon U28</div>
+        <div class="stat-value">${u28Mandate}</div>
+        <div class="stat-sub">${(u28Anteil * 100).toFixed(1)} % in Mitgliedschaft</div>
+      </div>
+    </div>
+    ${warnung}
+  `;
+
+  if (typ === 'ftv') {
+    const aktiveBetriebe = betriebe.filter(b => b.mitglieder > 0);
+    if (aktiveBetriebe.length > 0) {
+      const verteilung = verteileMandate(mandate, betriebe);
+      const anzeige = verteilung.filter(b => b.mitglieder > 0);
+      html += `
+        <div class="section-title">Verteilung auf Betriebe</div>
+        <div class="betrieb-result-table">
+          <div class="betrieb-result-row header">
+            <span>Betrieb</span>
+            <span style="text-align:right;">Anteil</span>
+            <span style="text-align:right;">Mandate</span>
+          </div>
+          ${anzeige.map(b => `
+            <div class="betrieb-result-row">
+              <span>
+                <div class="betrieb-name">${escapeHtml(b.name) || '<em style="color:var(--text-tertiary); font-weight:400;">unbenannt</em>'}</div>
+                <div class="betrieb-mitglieder">${b.mitglieder.toLocaleString('de-DE')} Mitglieder</div>
+              </span>
+              <span style="text-align:right; color:var(--text-secondary);">${b.anteil.toFixed(1)} %</span>
+              <span style="text-align:right; font-weight:600; font-size:16px;">${b.mandate}</span>
+            </div>
+          `).join('')}
+        </div>
+        <p class="hint">Verteilung nach Hare-Niemeyer-Verfahren. Jeder Betrieb mit Mitgliedern erhält mindestens 1 Mandat; Restmandate werden nach größten Nachkommaresten vergeben.</p>
+      `;
+    }
+  }
+
+  html += `
+    <div class="section-title">Zusammenfassung</div>
+    <div>
+      <span class="pill">${mandate} Plätze gesamt</span>
+      <span class="pill pill-pink">${frauenMandate} Frauenmandate</span>
+      <span class="pill pill-amber">${u28Mandate} U28-Mandate</span>
+    </div>
+  `;
+
+  ergebnis.innerHTML = html;
+}
+
+document.getElementById('htv-mitglieder').addEventListener('input', render);
+document.getElementById('frauen').addEventListener('input', render);
+document.getElementById('u28').addEventListener('input', render);
+
+renderBetriebe();
+render();
+</script>
+
+</body>
+</html>
