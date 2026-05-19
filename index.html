@@ -688,11 +688,11 @@ function render() {
 
   const frauenAnteil = mitgliederGesamt > 0 ? frauen / mitgliederGesamt : 0;
   const u28Anteil = mitgliederGesamt > 0 ? u28 / mitgliederGesamt : 0;
-  // Mindestens 1 Mandat, wenn Anzahl > 0
+  // Mindestmandate: Frauen 1, U28 2 (sofern in Mitgliedschaft vorhanden)
   let frauenMandate = Math.round(frauenAnteil * mandate);
   if (frauen > 0 && frauenMandate < 1) frauenMandate = 1;
   let u28Mandate = Math.round(u28Anteil * mandate);
-  if (u28 > 0 && u28Mandate < 1) u28Mandate = 1;
+  if (u28 > 0 && u28Mandate < 2) u28Mandate = 2;
 
   const ergebnis = document.getElementById('ergebnis');
 
@@ -724,10 +724,10 @@ function render() {
 
   // Hinweis zu Frauen/U28-Mindestmandat
   let quoteHinweis = '';
-  if ((frauen > 0 && frauenMandate >= 1) || (u28 > 0 && u28Mandate >= 1)) {
+  if ((frauen > 0 && frauenMandate >= 1) || (u28 > 0 && u28Mandate >= 2)) {
     quoteHinweis = `<div class="info-box">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg>
-      <div class="info-body"><strong>Frauen und U28 müssen jeweils mit mindestens einem Mandat vertreten sein</strong>, sofern in der Mitgliedschaft vorhanden. Begründete Ausnahmen (z.B. bei sehr geringer Anzahl und explizitem Verzicht) sind nur in Abstimmung mit dem Landesfachbereichsvorstand zulässig.</div>
+      <div class="info-body"><strong>Frauen müssen mit mindestens einem Mandat, Jugend (U28) mit mindestens zwei Mandaten vertreten sein</strong>, sofern in der Mitgliedschaft vorhanden. Begründete Ausnahmen (z.B. bei sehr geringer Anzahl und explizitem Verzicht) sind nur in Abstimmung mit dem Landesfachbereichsvorstand zulässig.</div>
     </div>`;
   }
 
