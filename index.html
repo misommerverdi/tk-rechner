@@ -335,13 +335,36 @@
     background: var(--warning-bg);
     color: var(--warning-text);
     font-size: 13px;
-    padding: 10px 14px;
+    padding: 12px 14px;
     border-radius: var(--radius-md);
     margin: 12px 0;
     display: flex;
-    align-items: center;
-    gap: 8px;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
   }
+
+  .warning svg { flex-shrink: 0; margin-top: 2px; }
+  .warning strong { font-weight: 600; }
+  .warning .warn-body { flex: 1; }
+
+  .info-box {
+    background: var(--verdi-rot-light);
+    color: var(--verdi-rot-dark);
+    font-size: 13px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    margin: 12px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+    border-left: 3px solid var(--verdi-rot);
+  }
+
+  .info-box svg { flex-shrink: 0; margin-top: 2px; }
+  .info-box strong { font-weight: 600; }
+  .info-box .info-body { flex: 1; }
 
   .hint {
     font-size: 12px;
@@ -392,7 +415,7 @@
 
   <div class="header">
     <h1>Rechner zur Zusammensetzung der Tarifkommission</h1>
-    <p class="subtitle">ver.di · FB B Landesbezirk SAT · TK-Mandate nach Staffelung mit Frauen-, U28- und Betriebsverteilung</p>
+    <p class="subtitle">ver.di · Landesbezirk · TK-Mandate nach Staffelung mit Frauen-, U28- und Betriebsverteilung</p>
   </div>
 
   <div class="card">
@@ -453,7 +476,8 @@
   </div>
 
   <div class="footer">
-    Mandatsverteilung bei Flächentarifverträgen nach Hare-Niemeyer-Verfahren. Mindestens 1 Mandat pro Betrieb mit Mitgliedern.
+    Mandatsverteilung bei Flächentarifverträgen nach Hare-Niemeyer-Verfahren. Mindestens 1 Mandat pro Betrieb mit Mitgliedern.<br>
+    Bei mehr als 8 Betrieben wird die TK schrittweise aufgebläht (max. 21 Mandate). Frauen und U28 müssen mit mindestens 1 Mandat vertreten sein.
   </div>
 
 </div>
@@ -592,6 +616,51 @@ function getStaffelLabel(mitglieder) {
   return "über 501";
 }
 
+// Hare-Niemeyer OHNE Mindestmandat-Override – zur Prüfung, wie viele Betriebe
+// sich rechnerisch ein Mandat "verdienen"
+function hareNiemeyerStrikt(mandateGesamt, einheiten) {
+  const aktive = einheiten.filter(e => e.mitglieder > 0);
+  const total = aktive.reduce((s, e) => s + e.mitglieder, 0);
+  if (total === 0 || mandateGesamt === 0) return einheiten.map(() => 0);
+
+  const quoten = aktive.map((e, i) => {
+    const q = (e.mitglieder / total) * mandateGesamt;
+    return { idx: einheiten.indexOf(e), ganz: Math.floor(q), rest: q - Math.floor(q) };
+  });
+  const summe = quoten.reduce((s, q) => s + q.ganz, 0);
+  const rest = mandateGesamt - summe;
+  const sortiert = [...quoten].sort((a, b) => b.rest - a.rest);
+  for (let i = 0; i < rest; i++) sortiert[i].ganz++;
+
+  const ergebnis = einheiten.map(() => 0);
+  quoten.forEach(q => { ergebnis[q.idx] = q.ganz; });
+  return ergebnis;
+}
+
+// Bei mehr als 8 Betrieben: TK schrittweise vergrößern, bis jeder Betrieb sich
+// rechnerisch sein Mandat verdient. Maximum: MAX_TK_GROESSE.
+const MAX_TK_GROESSE = 21;
+
+function bestimmeTKGroesse(standardMandate, betriebe) {
+  const aktive = betriebe.filter(b => b.mitglieder > 0);
+  if (aktive.length <= 8) {
+    return { mandate: standardMandate, aufgeblaeht: false, deckel: false };
+  }
+
+  // Aufblähen in 2er-Schritten (ungerade bleibt ungerade)
+  let tk = standardMandate;
+  while (tk < MAX_TK_GROESSE) {
+    const strikt = hareNiemeyerStrikt(tk, betriebe);
+    const verdient = strikt.filter(m => m > 0).length;
+    if (verdient >= aktive.length) {
+      return { mandate: tk, aufgeblaeht: tk > standardMandate, deckel: false };
+    }
+    tk += 2;
+  }
+  // Deckel erreicht
+  return { mandate: MAX_TK_GROESSE, aufgeblaeht: true, deckel: true };
+}
+
 function render() {
   const frauen = parseInt(document.getElementById('frauen').value) || 0;
   const u28 = parseInt(document.getElementById('u28').value) || 0;
@@ -603,13 +672,27 @@ function render() {
     mitgliederGesamt = betriebe.reduce((s, b) => s + b.mitglieder, 0);
   }
 
-  const mandate = mitgliederGesamt > 0 ? getMandate(mitgliederGesamt) : 0;
+  const standardMandate = mitgliederGesamt > 0 ? getMandate(mitgliederGesamt) : 0;
   const staffel = mitgliederGesamt > 0 ? getStaffelLabel(mitgliederGesamt) : "";
+
+  // TK-Größe ggf. aufblähen (nur bei FTV)
+  let mandate = standardMandate;
+  let aufgeblaeht = false;
+  let deckel = false;
+  if (typ === 'ftv' && mitgliederGesamt > 0) {
+    const result = bestimmeTKGroesse(standardMandate, betriebe);
+    mandate = result.mandate;
+    aufgeblaeht = result.aufgeblaeht;
+    deckel = result.deckel;
+  }
 
   const frauenAnteil = mitgliederGesamt > 0 ? frauen / mitgliederGesamt : 0;
   const u28Anteil = mitgliederGesamt > 0 ? u28 / mitgliederGesamt : 0;
-  const frauenMandate = Math.round(frauenAnteil * mandate);
-  const u28Mandate = Math.round(u28Anteil * mandate);
+  // Mindestens 1 Mandat, wenn Anzahl > 0
+  let frauenMandate = Math.round(frauenAnteil * mandate);
+  if (frauen > 0 && frauenMandate < 1) frauenMandate = 1;
+  let u28Mandate = Math.round(u28Anteil * mandate);
+  if (u28 > 0 && u28Mandate < 1) u28Mandate = 1;
 
   const ergebnis = document.getElementById('ergebnis');
 
@@ -618,11 +701,33 @@ function render() {
     return;
   }
 
+  // Plausibilitätswarnung
   let warnung = '';
   if (frauen > mitgliederGesamt || u28 > mitgliederGesamt) {
     warnung = `<div class="warning">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-      Frauen- bzw. U28-Zahl ist größer als die Gesamtmitgliedschaft. Bitte prüfen.
+      <div class="warn-body">Frauen- bzw. U28-Zahl ist größer als die Gesamtmitgliedschaft. Bitte prüfen.</div>
+    </div>`;
+  }
+
+  // Hinweis bei aufgeblähter TK
+  let lbzfbHinweis = '';
+  if (aufgeblaeht) {
+    const deckelText = deckel
+      ? ` Auch die maximale Größe von ${MAX_TK_GROESSE} Mandaten reicht nicht aus, um allen Betrieben rechnerisch ein Mandat zuzuteilen – die kleinsten Betriebe erhalten ihr Mandat über die Mindestmandats-Regel.`
+      : '';
+    lbzfbHinweis = `<div class="info-box">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      <div class="info-body"><strong>Vergrößerte TK aufgrund hoher Betriebszahl.</strong> Die Standardgröße nach Staffelung (${standardMandate}) wurde auf <strong>${mandate} Mandate</strong> erhöht, damit die proportionale Vertretung der größeren Betriebe gewahrt bleibt.${deckelText} Die konkrete Zusammensetzung ist aufgrund der besonderen Ausgangslage mit dem Landesfachbereichsvorstand abzuklären.</div>
+    </div>`;
+  }
+
+  // Hinweis zu Frauen/U28-Mindestmandat
+  let quoteHinweis = '';
+  if ((frauen > 0 && frauenMandate >= 1) || (u28 > 0 && u28Mandate >= 1)) {
+    quoteHinweis = `<div class="info-box">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg>
+      <div class="info-body"><strong>Frauen und U28 müssen jeweils mit mindestens einem Mandat vertreten sein</strong>, sofern in der Mitgliedschaft vorhanden. Begründete Ausnahmen (z.B. bei sehr geringer Anzahl und explizitem Verzicht) sind nur in Abstimmung mit dem Landesfachbereichsvorstand zulässig.</div>
     </div>`;
   }
 
@@ -636,7 +741,7 @@ function render() {
       <div class="stat stat-highlight">
         <div class="stat-label">TK-Mandate</div>
         <div class="stat-value">${mandate}</div>
-        <div class="stat-sub">nach Staffelung</div>
+        <div class="stat-sub">${aufgeblaeht ? `aufgebläht von ${standardMandate}` : 'nach Staffelung'}</div>
       </div>
       <div class="stat">
         <div class="stat-label">davon Frauen</div>
@@ -650,6 +755,8 @@ function render() {
       </div>
     </div>
     ${warnung}
+    ${lbzfbHinweis}
+    ${quoteHinweis}
   `;
 
   if (typ === 'ftv') {
