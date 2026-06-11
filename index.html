@@ -405,7 +405,32 @@
   @media print {
     body { background: white; }
     .no-print { display: none !important; }
-    .card { border: 1px solid #ccc; page-break-inside: avoid; }
+    .card { border: 1px solid #ccc; page-break-inside: avoid; box-shadow: none; }
+    /* Beim Drucken nur Header, Tarifgebiet und Ergebnis zeigen */
+    .card.print-hide { display: none !important; }
+    .print-only { display: block !important; }
+    #print-header { display: block !important; }
+  }
+
+  .print-only { display: none; }
+
+  #print-header {
+    display: none;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--verdi-rot);
+  }
+
+  #print-header .print-tarifgebiet {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  #print-header .print-datum {
+    font-size: 13px;
+    color: var(--text-secondary);
   }
 </style>
 </head>
@@ -418,7 +443,17 @@
     <p class="subtitle">ver.di · Landesbezirk · TK-Mandate nach Staffelung mit Frauen-, U28- und Betriebsverteilung</p>
   </div>
 
-  <div class="card">
+  <div id="print-header">
+    <div class="print-tarifgebiet" id="print-tarifgebiet-text"></div>
+    <div class="print-datum" id="print-datum-text"></div>
+  </div>
+
+  <div class="card no-print">
+    <span class="step-label">Tarifgebiet / Bezeichnung</span>
+    <input type="text" id="tarifgebiet" placeholder="z.B. TV-N Thüringen, Zoo Leipzig, AVN Sachsen-Anhalt …" />
+  </div>
+
+  <div class="card no-print">
     <span class="step-label">1 · Art des Tarifvertrags</span>
     <div class="toggle-group">
       <button id="btn-htv" class="toggle-btn active" onclick="setTyp('htv')">Haustarifvertrag</button>
@@ -426,12 +461,12 @@
     </div>
   </div>
 
-  <div class="card" id="htv-block">
+  <div class="card no-print" id="htv-block">
     <span class="step-label">2 · Mitglieder im Betrieb</span>
     <input type="number" id="htv-mitglieder" min="0" value="220" />
   </div>
 
-  <div class="card" id="ftv-block" style="display:none;">
+  <div class="card no-print" id="ftv-block" style="display:none;">
     <span class="step-label">2 · Betriebe im Tarifgebiet</span>
     <div class="betrieb-header">
       <span>Betriebsname</span>
@@ -445,7 +480,7 @@
     </button>
   </div>
 
-  <div class="card">
+  <div class="card no-print">
     <span class="step-label">3 · Frauen- und U28-Anteil (gesamtes Tarifgebiet)</span>
     <div class="row">
       <div>
@@ -461,10 +496,10 @@
   </div>
 
   <div class="card" id="ergebnis-card">
-    <span class="step-label">Ergebnis · Zusammensetzung der TK</span>
+    <span class="step-label no-print">Ergebnis · Zusammensetzung der TK</span>
     <div id="ergebnis"></div>
     <div class="actions no-print">
-      <button class="btn" onclick="window.print()">
+      <button class="btn" onclick="druckenMitHeader()">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
         Drucken / als PDF speichern
       </button>
@@ -475,9 +510,9 @@
     </div>
   </div>
 
-  <div class="footer">
+  <div class="footer no-print">
     Mandatsverteilung bei Flächentarifverträgen nach Hare-Niemeyer-Verfahren. Mindestens 1 Mandat pro Betrieb mit Mitgliedern.<br>
-    Bei mehr als 8 Betrieben wird die TK schrittweise aufgebläht (max. 21 Mandate). Frauen müssen mit mindestens einem Mandat, Jugend (U28) mit mindestens zwei Mandaten vertreten sein.
+    Bei mehr als 8 Betrieben oder zu wenig Standardmandaten wird die TK schrittweise aufgebläht (max. ca. 1,5-fache der Standardgröße, absolute Obergrenze 19 Mandate). Frauen mit mind. 1 Mandat, Jugend (U28) mit mind. 2 Mandaten vertreten.
   </div>
 
 </div>
@@ -555,12 +590,32 @@ function removeBetrieb(i) {
 
 function resetForm() {
   betriebe = [{ name: '', mitglieder: 0 }, { name: '', mitglieder: 0 }];
+  document.getElementById('tarifgebiet').value = '';
   document.getElementById('htv-mitglieder').value = 0;
   document.getElementById('frauen').value = 0;
   document.getElementById('u28').value = 0;
   setTyp('htv');
   renderBetriebe();
   render();
+}
+
+// Befüllt den Druck-Header mit Tarifgebiet und Datum, dann Druckdialog öffnen
+function druckenMitHeader() {
+  const tarifgebiet = document.getElementById('tarifgebiet').value.trim();
+  const tarifgebietEl = document.getElementById('print-tarifgebiet-text');
+  const datumEl = document.getElementById('print-datum-text');
+
+  tarifgebietEl.textContent = tarifgebiet
+    ? `Tarifkommission: ${tarifgebiet}`
+    : 'Zusammensetzung der Tarifkommission';
+
+  const heute = new Date();
+  const datumFormatiert = heute.toLocaleDateString('de-DE', {
+    day: '2-digit', month: '2-digit', year: 'numeric'
+  });
+  datumEl.textContent = `Stand: ${datumFormatiert}`;
+
+  window.print();
 }
 
 // Hare-Niemeyer-Verteilung mit Mindestmandat 1 pro Betrieb mit Mitgliedern
@@ -637,19 +692,34 @@ function hareNiemeyerStrikt(mandateGesamt, einheiten) {
   return ergebnis;
 }
 
-// Bei mehr als 8 Betrieben: TK schrittweise vergrößern, bis jeder Betrieb sich
-// rechnerisch sein Mandat verdient. Maximum: MAX_TK_GROESSE.
-const MAX_TK_GROESSE = 21;
+// Bei mehr als 8 Betrieben ODER mehr Betrieben als Standard-Mandate:
+// TK schrittweise vergrößern. Obergrenze dynamisch nach Standardstaffelung
+// (etwa 1,5-faches, auf nächste ungerade Zahl abgerundet), absolute Obergrenze MAX_TK_GROESSE.
+const MAX_TK_GROESSE = 19;
+
+function maxTKGroesse(standardMandate) {
+  // 1,5× Standardmandate, ABGERUNDET auf nächste ungerade Zahl,
+  // mindestens aber standardMandate + 2 (damit überhaupt Aufblähung möglich ist)
+  const erhoeht = Math.floor(standardMandate * 1.5);
+  const ungerade = erhoeht % 2 === 0 ? erhoeht - 1 : erhoeht;
+  const sicher = Math.max(ungerade, standardMandate + 2);
+  return Math.min(sicher, MAX_TK_GROESSE);
+}
 
 function bestimmeTKGroesse(standardMandate, betriebe) {
   const aktive = betriebe.filter(b => b.mitglieder > 0);
-  if (aktive.length <= 8) {
+  // Aufblähen triggern, wenn mehr als 8 Betriebe ODER wenn weniger
+  // Standard-Mandate als Betriebe vorhanden sind.
+  const muss_aufblaehen = aktive.length > 8 || aktive.length > standardMandate;
+  if (!muss_aufblaehen) {
     return { mandate: standardMandate, aufgeblaeht: false, deckel: false };
   }
 
+  const maxGroesse = maxTKGroesse(standardMandate);
+
   // Aufblähen in 2er-Schritten (ungerade bleibt ungerade)
   let tk = standardMandate;
-  while (tk < MAX_TK_GROESSE) {
+  while (tk < maxGroesse) {
     const strikt = hareNiemeyerStrikt(tk, betriebe);
     const verdient = strikt.filter(m => m > 0).length;
     if (verdient >= aktive.length) {
@@ -657,8 +727,8 @@ function bestimmeTKGroesse(standardMandate, betriebe) {
     }
     tk += 2;
   }
-  // Deckel erreicht
-  return { mandate: MAX_TK_GROESSE, aufgeblaeht: true, deckel: true };
+  // Deckel erreicht (mitgliederabhängig)
+  return { mandate: maxGroesse, aufgeblaeht: maxGroesse > standardMandate, deckel: true };
 }
 
 function render() {
@@ -714,11 +784,11 @@ function render() {
   let lbzfbHinweis = '';
   if (aufgeblaeht) {
     const deckelText = deckel
-      ? ` Auch die maximale Größe von ${MAX_TK_GROESSE} Mandaten reicht nicht aus, um allen Betrieben rechnerisch ein Mandat zuzuteilen – die kleinsten Betriebe erhalten ihr Mandat über die Mindestmandats-Regel.`
+      ? ` Auch die für diese Größenstaffel maximal zulässige TK-Größe von ${mandate} Mandaten reicht nicht aus, um allen Betrieben rechnerisch ein Mandat zuzuteilen – die kleinsten Betriebe erhalten ihr Mandat über die Mindestmandats-Regel.`
       : '';
     lbzfbHinweis = `<div class="info-box">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-      <div class="info-body"><strong>Vergrößerte TK aufgrund hoher Betriebszahl.</strong> Die Standardgröße nach Staffelung (${standardMandate}) wurde auf <strong>${mandate} Mandate</strong> erhöht, damit die proportionale Vertretung der größeren Betriebe gewahrt bleibt.${deckelText} Die konkrete Zusammensetzung ist aufgrund der besonderen Ausgangslage mit dem Landesfachbereichsvorstand abzuklären.</div>
+      <div class="info-body"><strong>Vergrößerte TK aufgrund der Betriebsstruktur.</strong> Die Standardgröße nach Staffelung (${standardMandate}) wurde auf <strong>${mandate} Mandate</strong> erhöht, damit alle Betriebe angemessen vertreten werden können.${deckelText} Die konkrete Zusammensetzung ist aufgrund der besonderen Ausgangslage mit dem Landesfachbereichsvorstand abzuklären.</div>
     </div>`;
   }
 
