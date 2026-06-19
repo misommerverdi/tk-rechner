@@ -512,7 +512,7 @@
 
   <div class="footer no-print">
     Mandatsverteilung bei Flächentarifverträgen nach Hare-Niemeyer-Verfahren. Mindestens 1 Mandat pro Betrieb mit Mitgliedern.<br>
-    Bei mehr als 8 Betrieben oder zu wenig Standardmandaten wird die TK schrittweise aufgebläht (max. ca. 1,5-fache der Standardgröße, absolute Obergrenze 19 Mandate). Frauen mit mind. 1 Mandat, Jugend (U28) mit mind. 2 Mandaten vertreten.
+    Bei mehr als 8 Betrieben oder zu wenig Standardmandaten wird die TK schrittweise aufgebläht (max. ca. 1,5-fache der Standardgröße, absolute Obergrenze 19 Mandate). Bei TK-Größen bis 7 werden die 2 Jugendmandate „on top" gerechnet, ab TK 9 sind sie inklusive. Frauen mit mind. 1 Mandat.
   </div>
 
 </div>
@@ -758,11 +758,26 @@ function render() {
 
   const frauenAnteil = mitgliederGesamt > 0 ? frauen / mitgliederGesamt : 0;
   const u28Anteil = mitgliederGesamt > 0 ? u28 / mitgliederGesamt : 0;
-  // Mindestmandate: Frauen 1, U28 2 (sofern in Mitgliedschaft vorhanden)
+
+  // U28-Behandlung: Bei Kern-TK ≤ 7 werden Jugendmandate ON TOP gerechnet (+2),
+  // ab Kern-TK ≥ 9 sind sie INKLUSIVE (proportional, mind. 2).
+  const u28OnTop = mandate <= 7 && u28 > 0;
+
+  // Frauen: proportional zur Kern-TK, mind. 1
   let frauenMandate = Math.round(frauenAnteil * mandate);
   if (frauen > 0 && frauenMandate < 1) frauenMandate = 1;
-  let u28Mandate = Math.round(u28Anteil * mandate);
-  if (u28 > 0 && u28Mandate < 2) u28Mandate = 2;
+
+  // U28-Mandate
+  let u28Mandate;
+  if (u28OnTop) {
+    u28Mandate = 2;
+  } else {
+    u28Mandate = Math.round(u28Anteil * mandate);
+    if (u28 > 0 && u28Mandate < 2) u28Mandate = 2;
+  }
+
+  // Gesamtgröße der TK (Kern-TK + ggf. 2 on-top)
+  const gesamtMandate = mandate + (u28OnTop ? 2 : 0);
 
   const ergebnis = document.getElementById('ergebnis');
 
@@ -792,6 +807,15 @@ function render() {
     </div>`;
   }
 
+  // Hinweis bei U28-On-Top
+  let onTopHinweis = '';
+  if (u28OnTop) {
+    onTopHinweis = `<div class="info-box">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+      <div class="info-body"><strong>Jugendmandate „on top":</strong> Bei TK-Größen bis 7 Personen werden die zwei Jugendmandate zusätzlich zur Kern-TK gerechnet. Die TK besteht damit aus <strong>${mandate} Mandaten (Kern-TK)</strong> + <strong>2 U28-Mandaten</strong> = ${gesamtMandate} Personen.</div>
+    </div>`;
+  }
+
   // Hinweis zu Frauen/U28-Mindestmandat
   let quoteHinweis = '';
   if ((frauen > 0 && frauenMandate >= 1) || (u28 > 0 && u28Mandate >= 2)) {
@@ -810,8 +834,8 @@ function render() {
       </div>
       <div class="stat stat-highlight">
         <div class="stat-label">TK-Mandate</div>
-        <div class="stat-value">${mandate}</div>
-        <div class="stat-sub">${aufgeblaeht ? `aufgebläht von ${standardMandate}` : 'nach Staffelung'}</div>
+        <div class="stat-value">${gesamtMandate}</div>
+        <div class="stat-sub">${u28OnTop ? `${mandate} + 2 U28 (on top)` : (aufgeblaeht ? `aufgebläht von ${standardMandate}` : 'nach Staffelung')}</div>
       </div>
       <div class="stat">
         <div class="stat-label">davon Frauen</div>
@@ -819,13 +843,14 @@ function render() {
         <div class="stat-sub">${(frauenAnteil * 100).toFixed(1)} % in Mitgliedschaft</div>
       </div>
       <div class="stat">
-        <div class="stat-label">davon U28</div>
+        <div class="stat-label">${u28OnTop ? 'U28 (on top)' : 'davon U28'}</div>
         <div class="stat-value">${u28Mandate}</div>
         <div class="stat-sub">${(u28Anteil * 100).toFixed(1)} % in Mitgliedschaft</div>
       </div>
     </div>
     ${warnung}
     ${lbzfbHinweis}
+    ${onTopHinweis}
     ${quoteHinweis}
   `;
 
@@ -861,9 +886,9 @@ function render() {
   html += `
     <div class="section-title">Zusammenfassung</div>
     <div>
-      <span class="pill">${mandate} Plätze gesamt</span>
+      <span class="pill">${gesamtMandate} Plätze gesamt${u28OnTop ? ` (${mandate} + 2)` : ''}</span>
       <span class="pill pill-pink">${frauenMandate} Frauenmandate</span>
-      <span class="pill pill-amber">${u28Mandate} U28-Mandate</span>
+      <span class="pill pill-amber">${u28Mandate} U28-Mandate${u28OnTop ? ' (on top)' : ''}</span>
     </div>
   `;
 
