@@ -477,6 +477,80 @@
     margin-bottom: 4px;
   }
 
+  /* Ersatz-Zeile: kompakt unter der Hauptzeile */
+  .ersatz-zeile {
+    display: grid;
+    grid-template-columns: 32px minmax(140px, 1.6fr) 110px 1fr;
+    gap: 10px;
+    align-items: center;
+    padding: 4px 0 10px;
+    margin-top: -4px;
+  }
+
+  .ersatz-zeile .ersatz-label {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    text-align: right;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+    padding-right: 4px;
+  }
+
+  .ersatz-zeile input[type="text"] {
+    padding: 6px 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+  }
+
+  .ersatz-zeile input[type="text"]:focus {
+    color: var(--text-primary);
+    background: var(--bg-primary);
+  }
+
+  .ersatz-zeile.on-top {
+    background: var(--verdi-rot-light);
+    padding: 4px 10px 10px;
+    margin-top: -8px;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+  }
+
+  /* On-Top-Sektion mit Betriebs-Auswahl-Zeile darüber */
+  .ontop-wrap {
+    background: var(--verdi-rot-light);
+    border-radius: var(--radius-md);
+    padding: 10px 10px 8px;
+    margin-bottom: 6px;
+  }
+
+  .ontop-wrap .betrieb-select-zeile {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 10px;
+    align-items: center;
+    padding: 0 0 6px;
+    font-size: 12px;
+    color: var(--verdi-rot-dark);
+  }
+
+  .ontop-wrap .betrieb-select-zeile .betrieb-select {
+    width: 100%;
+    max-width: 260px;
+  }
+
+  .ontop-wrap .mandat-zeile.on-top {
+    background: transparent;
+    padding: 0;
+    margin-bottom: 0;
+  }
+
+  .ontop-wrap .ersatz-zeile.on-top {
+    background: transparent;
+    padding: 4px 0 0;
+    margin-top: 0;
+  }
+
   .quoten-check {
     display: flex;
     gap: 12px;
@@ -585,6 +659,12 @@
     }
     .mandat-zeile .mandat-nr { grid-row: 1 / 4; }
     .mandat-zeile > *:not(.mandat-nr) { grid-column: 2; }
+    .ersatz-zeile {
+      grid-template-columns: 24px 1fr;
+      grid-template-rows: auto auto auto;
+    }
+    .ersatz-zeile .ersatz-label { grid-row: 1 / 4; text-align: left; padding-left: 4px; }
+    .ersatz-zeile > *:not(.ersatz-label) { grid-column: 2; }
   }
 
   .empty-state {
@@ -1349,26 +1429,19 @@ function renderMeldung() {
     html += `<div class="betrieb-gruppe"><div class="betrieb-gruppe-header"><div>${titel}</div></div>`;
 
     gruppe.mandate.forEach((m, i) => {
-      const werte = bisher[mandatIdx] || { name: '', mitgliedsnr: '', frau: false, u28: m.onTop };
+      const werte = bisher[mandatIdx] || {
+        name: '', mitgliedsnr: '',
+        ersatzName: '', ersatzMitgliedsnr: '',
+        frau: false, u28: m.onTop, betrieb: null
+      };
       // Bei On-Top-Sektion: U28 immer true (fest)
       const u28Fixed = m.onTop;
       const idx = mandatIdx;
 
-      // Bei On-Top mit FTV: Dropdown für Betriebszugehörigkeit
-      let betriebFeld = '';
-      if (gruppe.onTopSection && g.typ === 'ftv') {
-        const optionen = Object.keys(meldungState.betriebsMandate).map(bn =>
-          `<option value="${escapeHtml(bn)}"${werte.betrieb === bn ? ' selected' : ''}>${escapeHtml(bn)}</option>`
-        ).join('');
-        betriebFeld = `<select class="betrieb-select" onchange="updateMandat(${idx}, 'betrieb', this.value)" style="grid-column: 2 / -1; margin-bottom: 4px;">
-          <option value="">Betrieb wählen …</option>${optionen}
-        </select>`;
-      }
-
-      html += `
+      // Zeile für Name/Mitglnr/Checkboxen
+      const mandatZeileHtml = `
         <div class="mandat-zeile${m.onTop ? ' on-top' : ''}">
           <div class="mandat-nr">${i + 1}.</div>
-          ${betriebFeld ? `<div style="grid-column: 2 / -1;">${betriebFeld}</div>` : ''}
           <input type="text" placeholder="Vor- und Nachname" value="${escapeHtml(werte.name || '')}" oninput="updateMandat(${idx}, 'name', this.value)" class="name-input" />
           <input type="text" placeholder="Mitgl.-Nr." value="${escapeHtml(werte.mitgliedsnr || '')}" oninput="updateMandat(${idx}, 'mitgliedsnr', this.value)" class="mitglieds-nr" />
           <label class="checkbox-label${werte.frau ? ' checked' : ''}">
@@ -1382,15 +1455,58 @@ function renderMeldung() {
         </div>
       `;
 
+      // Ersatz-Zeile (optional)
+      const ersatzZeileHtml = `
+        <div class="ersatz-zeile${m.onTop ? ' on-top' : ''}">
+          <div class="mandat-nr"></div>
+          <input type="text" placeholder="Ersatzperson (optional)" value="${escapeHtml(werte.ersatzName || '')}" oninput="updateMandat(${idx}, 'ersatzName', this.value)" />
+          <input type="text" placeholder="Mitgl.-Nr." value="${escapeHtml(werte.ersatzMitgliedsnr || '')}" oninput="updateMandat(${idx}, 'ersatzMitgliedsnr', this.value)" class="mitglieds-nr" />
+          <div class="ersatz-label">Ersatz</div>
+        </div>
+      `;
+
+      // On-Top mit FTV: Wrapper mit eigener Betrieb-Auswahl-Zeile darüber
+      if (gruppe.onTopSection && g.typ === 'ftv') {
+        const optionen = Object.keys(meldungState.betriebsMandate).map(bn =>
+          `<option value="${escapeHtml(bn)}"${werte.betrieb === bn ? ' selected' : ''}>${escapeHtml(bn)}</option>`
+        ).join('');
+        html += `
+          <div class="ontop-wrap">
+            <div class="betrieb-select-zeile">
+              <span style="text-align:right; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px;">Betrieb</span>
+              <select class="betrieb-select" onchange="updateMandat(${idx}, 'betrieb', this.value)">
+                <option value="">Betrieb wählen …</option>${optionen}
+              </select>
+            </div>
+            ${mandatZeileHtml}
+            ${ersatzZeileHtml}
+          </div>
+        `;
+      } else {
+        html += mandatZeileHtml + ersatzZeileHtml;
+      }
+
       // State initialisieren falls noch nicht da
       if (!meldungState.mandate[mandatIdx]) {
         meldungState.mandate[mandatIdx] = {
           betrieb: gruppe.betrieb || (gruppe.onTopSection ? '' : null),
-          name: '', mitgliedsnr: '', frau: false, u28: m.onTop, onTop: m.onTop
+          name: '', mitgliedsnr: '',
+          ersatzName: '', ersatzMitgliedsnr: '',
+          frau: false, u28: m.onTop, onTop: m.onTop
         };
       } else {
         meldungState.mandate[mandatIdx].onTop = m.onTop;
-        if (m.onTop) meldungState.mandate[mandatIdx].u28 = true;
+        if (m.onTop) {
+          meldungState.mandate[mandatIdx].u28 = true;
+          // Betrieb bei on-top NICHT überschreiben - kommt vom User via Dropdown
+        } else {
+          // Bei regulären Mandaten Betrieb IMMER aus aktueller Struktur -
+          // wichtig bei Abweichungen, damit Personen den richtigen Betrieben zugeordnet bleiben
+          meldungState.mandate[mandatIdx].betrieb = gruppe.betrieb;
+        }
+        // Neue Felder für Ersatz sicherstellen (falls State aus älterer Version stammt)
+        if (meldungState.mandate[mandatIdx].ersatzName === undefined) meldungState.mandate[mandatIdx].ersatzName = '';
+        if (meldungState.mandate[mandatIdx].ersatzMitgliedsnr === undefined) meldungState.mandate[mandatIdx].ersatzMitgliedsnr = '';
       }
       mandatIdx++;
     });
@@ -1505,6 +1621,12 @@ function baueMailText() {
       let betriebZusatz = '';
       if (m.onTop && m.betrieb) betriebZusatz = ` – Betrieb: ${m.betrieb}`;
       text += `${i+1}. ${name}${nr}${kennzStr}${betriebZusatz}\n`;
+      // Ersatz nur ausgeben, wenn Name eingetragen
+      const ersatzName = (m.ersatzName || '').trim();
+      if (ersatzName) {
+        const ersatzNr = m.ersatzMitgliedsnr ? ` (Mitgl.-Nr. ${m.ersatzMitgliedsnr})` : ' (Mitgl.-Nr. fehlt)';
+        text += `   Ersatz: ${ersatzName}${ersatzNr}\n`;
+      }
     });
   });
 
