@@ -6,9 +6,9 @@
 <title>TK-Rechner | ver.di</title>
 <style>
   :root {
-    --verdi-rot: #EE7D00;
-    --verdi-rot-dark: #C96900;
-    --verdi-rot-light: #FEF1E0;
+    --verdi-rot: #E30045;
+    --verdi-rot-dark: #B8003A;
+    --verdi-rot-light: #FCE7EC;
     --text-primary: #1A1A1A;
     --text-secondary: #5F5F5F;
     --text-tertiary: #8A8A8A;
@@ -19,8 +19,8 @@
     --border-medium: rgba(0,0,0,0.15);
     --warning-bg: #FAEEDA;
     --warning-text: #633806;
-    --pink-bg: #FBEAF0;
-    --pink-text: #72243E;
+    --pink-bg: #F5D6E0;
+    --pink-text: #6E1A3A;
     --radius-md: 8px;
     --radius-lg: 12px;
   }
@@ -372,6 +372,221 @@
     margin: 6px 0 0;
   }
 
+  /* Meldeformular */
+  .view-meldung { display: none; }
+  body.mode-meldung .view-rechner { display: none; }
+  body.mode-meldung .view-meldung { display: block; }
+
+  .meldung-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .meldung-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .betrieb-gruppe {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .betrieb-gruppe:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .betrieb-gruppe-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .betrieb-gruppe-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .betrieb-gruppe-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .mandat-zeile {
+    display: grid;
+    grid-template-columns: 32px minmax(140px, 1.6fr) 110px auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 0;
+  }
+
+  .mandat-zeile input[type="text"] {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .mandat-zeile .mitglieds-nr {
+    font-family: -apple-system, BlinkMacSystemFont, monospace;
+    text-align: left;
+  }
+
+  .mandat-zeile .mandat-nr {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .mandat-zeile .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    cursor: pointer;
+    padding: 4px 8px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+    transition: all 0.15s;
+  }
+
+  .mandat-zeile .checkbox-label.checked {
+    border-color: var(--verdi-rot);
+    background: var(--verdi-rot-light);
+    color: var(--verdi-rot-dark);
+    font-weight: 500;
+  }
+
+  .mandat-zeile .checkbox-label input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .mandat-zeile.on-top {
+    background: var(--verdi-rot-light);
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    margin-bottom: 4px;
+  }
+
+  .quoten-check {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+    padding: 12px 14px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+  }
+
+  .quote-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .quote-item.ok { color: #1F7A3E; }
+  .quote-item.warn { color: var(--warning-text); }
+
+  .quote-item .quote-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  select.betrieb-select {
+    padding: 6px 10px;
+    font-size: 13px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+    font-family: inherit;
+  }
+
+  .abweichung-block {
+    background: var(--warning-bg);
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    border-left: 3px solid var(--warning-text);
+  }
+
+  .abweichung-block .abweichung-checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  .abweichung-block textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    margin-top: 10px;
+    resize: vertical;
+  }
+
+  .abweichung-block .mandat-anpassung {
+    display: grid;
+    grid-template-columns: 1fr 80px;
+    gap: 10px;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 13px;
+  }
+
+  .abweichung-block .mandat-anpassung input {
+    padding: 6px 10px;
+    font-size: 13px;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    text-align: right;
+  }
+
+  .abweichung-block .anpassung-titel {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .zusammenfassung-kompakt {
+    background: var(--bg-secondary);
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .zusammenfassung-kompakt strong { font-weight: 600; }
+
+  @media (max-width: 640px) {
+    .mandat-zeile {
+      grid-template-columns: 24px 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 6px 10px;
+    }
+    .mandat-zeile .mandat-nr { grid-row: 1 / 4; }
+    .mandat-zeile > *:not(.mandat-nr) { grid-column: 2; }
+  }
+
   .empty-state {
     text-align: center;
     color: var(--text-secondary);
@@ -448,6 +663,8 @@
     <div class="print-datum" id="print-datum-text"></div>
   </div>
 
+  <div class="view-rechner">
+
   <div class="card no-print">
     <span class="step-label">Tarifgebiet / Bezeichnung</span>
     <input type="text" id="tarifgebiet" placeholder="z.B. TV-N Thüringen, Zoo Leipzig, AVN Sachsen-Anhalt …" />
@@ -499,6 +716,10 @@
     <span class="step-label no-print">Ergebnis · Zusammensetzung der TK</span>
     <div id="ergebnis"></div>
     <div class="actions no-print">
+      <button class="btn btn-primary" onclick="zuMeldung()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+        Mandate besetzen und melden
+      </button>
       <button class="btn" onclick="druckenMitHeader()">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
         Drucken / als PDF speichern
@@ -512,8 +733,57 @@
 
   <div class="footer no-print">
     Mandatsverteilung bei Flächentarifverträgen nach Hare-Niemeyer-Verfahren. Mindestens 1 Mandat pro Betrieb mit Mitgliedern.<br>
-    Bei mehr als 8 Betrieben oder zu wenig Standardmandaten wird die TK schrittweise aufgebläht (max. ca. 1,5-fache der Standardgröße, absolute Obergrenze 19 Mandate). Bei TK-Größen bis 7 werden die 2 Jugendmandate „on top" gerechnet, ab TK 9 sind sie inklusive. Frauen mit mind. 1 Mandat.
+    Bei mehr als 8 Betrieben oder zu wenig Standardmandaten wird die TK schrittweise aufgebläht (max. ca. 1,5-fache der Standardgröße, absolute Obergrenze 19 Mandate). Bei TK-Größen bis 7 werden die 2 Jugendmandate „on top" gerechnet, ab TK 9 sind sie inklusive. Frauen sind entsprechend ihrem Anteil in der Mitgliedschaft vertreten.
   </div>
+
+  </div><!-- /view-rechner -->
+
+  <div class="view-meldung">
+
+    <div class="card">
+      <div class="meldung-header">
+        <h2 id="meldung-titel">Mandate besetzen und melden</h2>
+        <button class="btn no-print" onclick="zuRechner()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Zurück zum Rechner
+        </button>
+      </div>
+      <div class="zusammenfassung-kompakt" id="meldung-zusammenfassung"></div>
+
+      <div class="abweichung-block">
+        <label class="abweichung-checkbox-row">
+          <input type="checkbox" id="abweichung-check" onchange="toggleAbweichung()" style="margin-top: 2px;" />
+          <div>
+            <strong>Abweichung vom Beschluss der LFBV nötig</strong>
+            <div style="font-size: 12px; margin-top: 4px;">Aktivieren, wenn die Mandatszahlen pro Betrieb angepasst werden müssen (z.B. wegen komplexer Betriebsstrukturen). Ein entsprechender Beschluss der Landesfachbereichsvorstands muss dann gefasst werden.</div>
+          </div>
+        </label>
+        <div id="abweichung-details" style="display: none;">
+          <div class="anpassung-titel">Mandate pro Betrieb anpassen</div>
+          <div id="abweichung-mandate"></div>
+          <div class="anpassung-titel">Begründung für den Beschlussvorschlag</div>
+          <textarea id="abweichung-begruendung" placeholder="Kurze Begründung, warum die Mandatsverteilung angepasst werden muss …"></textarea>
+        </div>
+      </div>
+
+      <div id="meldung-formular"></div>
+
+      <div class="quoten-check" id="quoten-check"></div>
+
+      <div class="actions no-print" style="margin-top: 20px;">
+        <button class="btn btn-primary" onclick="mailtoSenden()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          Zusammensetzung an fb-b.sat@verdi.de senden
+        </button>
+        <button class="btn" onclick="zwischenablageKopieren()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Text in Zwischenablage kopieren
+        </button>
+      </div>
+      <p class="hint" id="mailto-hinweis" style="display: none;">Falls sich kein Mail-Programm öffnet: „Text in Zwischenablage kopieren" nutzen und die Mail selbst schreiben.</p>
+    </div>
+
+  </div><!-- /view-meldung -->
 
 </div>
 
@@ -763,9 +1033,8 @@ function render() {
   // ab Kern-TK ≥ 9 sind sie INKLUSIVE (proportional, mind. 2).
   const u28OnTop = mandate <= 7 && u28 > 0;
 
-  // Frauen: proportional zur Kern-TK, mind. 1
+  // Frauen: proportional zur Kern-TK (kein Mindestmandat)
   let frauenMandate = Math.round(frauenAnteil * mandate);
-  if (frauen > 0 && frauenMandate < 1) frauenMandate = 1;
 
   // U28-Mandate
   let u28Mandate;
@@ -816,12 +1085,12 @@ function render() {
     </div>`;
   }
 
-  // Hinweis zu Frauen/U28-Mindestmandat
+  // Hinweis zu Frauen-Proportionalität und U28-Mindestmandat
   let quoteHinweis = '';
-  if ((frauen > 0 && frauenMandate >= 1) || (u28 > 0 && u28Mandate >= 2)) {
+  if ((frauen > 0 && frauenMandate > 0) || u28 > 0) {
     quoteHinweis = `<div class="info-box">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg>
-      <div class="info-body"><strong>Frauen müssen mit mindestens einem Mandat, Jugend (U28) mit mindestens zwei Mandaten vertreten sein</strong>, sofern in der Mitgliedschaft vorhanden. Begründete Ausnahmen (z.B. bei sehr geringer Anzahl und explizitem Verzicht) sind nur in Abstimmung mit dem Landesfachbereichsvorstand zulässig.</div>
+      <div class="info-body"><strong>Frauen sind entsprechend ihrem Anteil in der Mitgliedschaft in der TK zu vertreten. Jugend (U28) muss mit mindestens zwei Mandaten vertreten sein</strong>, sofern in der Mitgliedschaft vorhanden. Begründete Ausnahmen sind nur in Abstimmung mit dem Landesfachbereichsvorstand zulässig.</div>
     </div>`;
   }
 
@@ -901,6 +1170,397 @@ document.getElementById('u28').addEventListener('input', render);
 
 renderBetriebe();
 render();
+
+// ============================================================
+// MELDUNG-LOGIK: Mandate besetzen und per Mail versenden
+// ============================================================
+
+// Zustand des Meldeformulars
+let meldungState = {
+  mandate: [],           // [{ betrieb, name, mitgliedsnr, frau, u28, onTop }]
+  betriebsMandate: {},   // { betriebsName: anzahlMandate } für Abweichung
+  abweichung: false,
+};
+
+function berechneMeldungGrundlage() {
+  // Baut die aktuelle Mandats-Struktur basierend auf dem Rechner-Zustand
+  const frauen = parseInt(document.getElementById('frauen').value) || 0;
+  const u28 = parseInt(document.getElementById('u28').value) || 0;
+  let mitgliederGesamt = 0;
+  if (typ === 'htv') {
+    mitgliederGesamt = parseInt(document.getElementById('htv-mitglieder').value) || 0;
+  } else {
+    mitgliederGesamt = betriebe.reduce((s, b) => s + b.mitglieder, 0);
+  }
+  const standardMandate = mitgliederGesamt > 0 ? getMandate(mitgliederGesamt) : 0;
+
+  let kernMandate = standardMandate;
+  let aufgeblaeht = false;
+  if (typ === 'ftv' && mitgliederGesamt > 0) {
+    const result = bestimmeTKGroesse(standardMandate, betriebe);
+    kernMandate = result.mandate;
+    aufgeblaeht = result.aufgeblaeht;
+  }
+
+  const u28OnTop = kernMandate <= 7 && u28 > 0;
+
+  return {
+    tarifgebiet: document.getElementById('tarifgebiet').value.trim(),
+    typ, mitgliederGesamt, frauen, u28,
+    kernMandate, u28OnTop, aufgeblaeht,
+    gesamtMandate: kernMandate + (u28OnTop ? 2 : 0),
+  };
+}
+
+function zuMeldung() {
+  const g = berechneMeldungGrundlage();
+  if (g.mitgliederGesamt === 0) {
+    alert('Bitte zuerst Mitgliederzahlen im Rechner eingeben.');
+    return;
+  }
+
+  // Betriebs-Mandate initialisieren (für Abweichung)
+  meldungState.betriebsMandate = {};
+  if (g.typ === 'ftv') {
+    const verteilung = verteileMandate(g.kernMandate, betriebe);
+    verteilung.filter(b => b.mitglieder > 0).forEach(b => {
+      meldungState.betriebsMandate[b.name || '(unbenannt)'] = b.mandate;
+    });
+  }
+
+  // Mandate-Array leeren und neu aufbauen (behält Werte nicht bei erneutem Aufruf)
+  meldungState.mandate = [];
+  meldungState.abweichung = false;
+  document.getElementById('abweichung-check').checked = false;
+  document.getElementById('abweichung-details').style.display = 'none';
+  document.getElementById('abweichung-begruendung').value = '';
+
+  document.body.classList.add('mode-meldung');
+  window.scrollTo(0, 0);
+  renderMeldung();
+}
+
+function zuRechner() {
+  document.body.classList.remove('mode-meldung');
+  window.scrollTo(0, 0);
+}
+
+function toggleAbweichung() {
+  meldungState.abweichung = document.getElementById('abweichung-check').checked;
+  document.getElementById('abweichung-details').style.display = meldungState.abweichung ? 'block' : 'none';
+  renderAbweichungAnpassung();
+  renderMeldung();
+}
+
+function renderAbweichungAnpassung() {
+  const container = document.getElementById('abweichung-mandate');
+  if (!meldungState.abweichung) { container.innerHTML = ''; return; }
+  const g = berechneMeldungGrundlage();
+  if (g.typ !== 'ftv') {
+    container.innerHTML = '<p style="font-size:12px; margin:0;">Bei einem Haustarifvertrag ist eine Anpassung der Mandate pro Betrieb nicht relevant. Nutze die Begründung, um die abweichende Zahl von TK-Mandaten zu erläutern.</p>';
+    return;
+  }
+  container.innerHTML = Object.entries(meldungState.betriebsMandate).map(([name, anzahl]) => `
+    <div class="mandat-anpassung">
+      <span>${escapeHtml(name)}</span>
+      <input type="number" min="0" value="${anzahl}" data-betrieb="${escapeHtml(name)}" oninput="updateBetriebsMandat(this)" />
+    </div>
+  `).join('');
+}
+
+function updateBetriebsMandat(input) {
+  const name = input.getAttribute('data-betrieb');
+  meldungState.betriebsMandate[name] = parseInt(input.value) || 0;
+  renderMeldung();
+}
+
+function getMandatsStruktur() {
+  // Liefert die aktuelle Mandat-Struktur zum Rendern der Formularzeilen
+  const g = berechneMeldungGrundlage();
+  const struktur = []; // [{ betrieb, mandate: [{ idx, onTop }] }]
+
+  if (g.typ === 'htv') {
+    const mandate = [];
+    for (let i = 0; i < g.kernMandate; i++) mandate.push({ onTop: false });
+    if (g.u28OnTop) {
+      mandate.push({ onTop: true });
+      mandate.push({ onTop: true });
+    }
+    struktur.push({ betrieb: null, mandate });
+  } else {
+    // FTV: Mandate pro Betrieb (entweder standard oder abweichung)
+    let betriebsMandate;
+    if (meldungState.abweichung) {
+      betriebsMandate = Object.entries(meldungState.betriebsMandate)
+        .filter(([_, n]) => n > 0)
+        .map(([name, n]) => ({ name, mandate: n }));
+    } else {
+      const verteilung = verteileMandate(g.kernMandate, betriebe);
+      betriebsMandate = verteilung.filter(b => b.mitglieder > 0)
+        .map(b => ({ name: b.name || '(unbenannt)', mandate: b.mandate }));
+    }
+    betriebsMandate.forEach(b => {
+      const mandate = [];
+      for (let i = 0; i < b.mandate; i++) mandate.push({ onTop: false });
+      struktur.push({ betrieb: b.name, mandate });
+    });
+    if (g.u28OnTop) {
+      struktur.push({
+        betrieb: null,
+        onTopSection: true,
+        mandate: [{ onTop: true }, { onTop: true }]
+      });
+    }
+  }
+  return { g, struktur };
+}
+
+function renderMeldung() {
+  const { g, struktur } = getMandatsStruktur();
+
+  // Titel und Zusammenfassung
+  document.getElementById('meldung-titel').textContent = g.tarifgebiet
+    ? `Mandate besetzen: ${g.tarifgebiet}`
+    : 'Mandate besetzen und melden';
+
+  const abwHinweis = meldungState.abweichung
+    ? '<br><strong style="color: var(--warning-text);">⚠ Abweichung vom Beschluss – Beschluss der LFBV nötig</strong>'
+    : '';
+  const totalPlaetze = struktur.reduce((s, g2) => s + g2.mandate.length, 0);
+  document.getElementById('meldung-zusammenfassung').innerHTML =
+    `<strong>${totalPlaetze} Mandate</strong> insgesamt · ${g.mitgliederGesamt.toLocaleString('de-DE')} Mitglieder`
+    + (g.u28OnTop ? ` · davon ${g.kernMandate} Kern-TK + 2 U28 on top` : '')
+    + abwHinweis;
+
+  // Bestehende Werte aus dem State beibehalten, wenn Größe stimmt
+  const bisher = meldungState.mandate;
+
+  // Formularzeilen rendern
+  const container = document.getElementById('meldung-formular');
+  let html = '';
+  let mandatIdx = 0;
+  struktur.forEach(gruppe => {
+    const titel = gruppe.onTopSection
+      ? '<div class="betrieb-gruppe-name">Jugendmandate (on top)</div><div class="betrieb-gruppe-meta">2 Mandate · werden zusätzlich zur Kern-TK gewählt</div>'
+      : (gruppe.betrieb
+          ? `<div class="betrieb-gruppe-name">${escapeHtml(gruppe.betrieb)}</div><div class="betrieb-gruppe-meta">${gruppe.mandate.length} Mandat${gruppe.mandate.length !== 1 ? 'e' : ''}</div>`
+          : `<div class="betrieb-gruppe-name">Kern-TK</div><div class="betrieb-gruppe-meta">${gruppe.mandate.length} Mandat${gruppe.mandate.length !== 1 ? 'e' : ''}</div>`);
+
+    html += `<div class="betrieb-gruppe"><div class="betrieb-gruppe-header"><div>${titel}</div></div>`;
+
+    gruppe.mandate.forEach((m, i) => {
+      const werte = bisher[mandatIdx] || { name: '', mitgliedsnr: '', frau: false, u28: m.onTop };
+      // Bei On-Top-Sektion: U28 immer true (fest)
+      const u28Fixed = m.onTop;
+      const idx = mandatIdx;
+
+      // Bei On-Top mit FTV: Dropdown für Betriebszugehörigkeit
+      let betriebFeld = '';
+      if (gruppe.onTopSection && g.typ === 'ftv') {
+        const optionen = Object.keys(meldungState.betriebsMandate).map(bn =>
+          `<option value="${escapeHtml(bn)}"${werte.betrieb === bn ? ' selected' : ''}>${escapeHtml(bn)}</option>`
+        ).join('');
+        betriebFeld = `<select class="betrieb-select" onchange="updateMandat(${idx}, 'betrieb', this.value)" style="grid-column: 2 / -1; margin-bottom: 4px;">
+          <option value="">Betrieb wählen …</option>${optionen}
+        </select>`;
+      }
+
+      html += `
+        <div class="mandat-zeile${m.onTop ? ' on-top' : ''}">
+          <div class="mandat-nr">${i + 1}.</div>
+          ${betriebFeld ? `<div style="grid-column: 2 / -1;">${betriebFeld}</div>` : ''}
+          <input type="text" placeholder="Vor- und Nachname" value="${escapeHtml(werte.name || '')}" oninput="updateMandat(${idx}, 'name', this.value)" class="name-input" />
+          <input type="text" placeholder="Mitgl.-Nr." value="${escapeHtml(werte.mitgliedsnr || '')}" oninput="updateMandat(${idx}, 'mitgliedsnr', this.value)" class="mitglieds-nr" />
+          <label class="checkbox-label${werte.frau ? ' checked' : ''}">
+            <input type="checkbox" ${werte.frau ? 'checked' : ''} onchange="updateMandat(${idx}, 'frau', this.checked)" />
+            Frau
+          </label>
+          <label class="checkbox-label${werte.u28 || u28Fixed ? ' checked' : ''}" ${u28Fixed ? 'style="opacity: 0.7; cursor: not-allowed;"' : ''}>
+            <input type="checkbox" ${werte.u28 || u28Fixed ? 'checked' : ''} ${u28Fixed ? 'disabled' : ''} onchange="updateMandat(${idx}, 'u28', this.checked)" />
+            U28
+          </label>
+        </div>
+      `;
+
+      // State initialisieren falls noch nicht da
+      if (!meldungState.mandate[mandatIdx]) {
+        meldungState.mandate[mandatIdx] = {
+          betrieb: gruppe.betrieb || (gruppe.onTopSection ? '' : null),
+          name: '', mitgliedsnr: '', frau: false, u28: m.onTop, onTop: m.onTop
+        };
+      } else {
+        meldungState.mandate[mandatIdx].onTop = m.onTop;
+        if (m.onTop) meldungState.mandate[mandatIdx].u28 = true;
+      }
+      mandatIdx++;
+    });
+    html += '</div>';
+  });
+  // Überflüssige Einträge im State abschneiden
+  meldungState.mandate = meldungState.mandate.slice(0, mandatIdx);
+  container.innerHTML = html;
+
+  renderQuotenCheck();
+}
+
+function updateMandat(idx, field, value) {
+  if (!meldungState.mandate[idx]) meldungState.mandate[idx] = {};
+  meldungState.mandate[idx][field] = value;
+  // Nur Quoten-Check neu rendern, nicht das ganze Formular (sonst gehen Cursor verloren)
+  renderQuotenCheck();
+  // Aber die Checkbox-Label-Farbe muss aktualisiert werden
+  if (field === 'frau' || field === 'u28') renderMeldung();
+}
+
+function renderQuotenCheck() {
+  const g = berechneMeldungGrundlage();
+  const container = document.getElementById('quoten-check');
+
+  // Frauenmandate proportional zur Kern-TK (kein Mindestmandat)
+  const frauenAnteil = g.mitgliederGesamt > 0 ? g.frauen / g.mitgliederGesamt : 0;
+  let frauenSoll = Math.round(frauenAnteil * g.kernMandate);
+
+  // U28-Mandate
+  let u28Soll;
+  if (g.u28OnTop) {
+    u28Soll = 2;
+  } else {
+    const u28Anteil = g.mitgliederGesamt > 0 ? g.u28 / g.mitgliederGesamt : 0;
+    u28Soll = Math.round(u28Anteil * g.kernMandate);
+    if (g.u28 > 0 && u28Soll < 2) u28Soll = 2;
+  }
+
+  const frauenIst = meldungState.mandate.filter(m => m.frau).length;
+  const u28Ist = meldungState.mandate.filter(m => m.u28).length;
+  const namenIst = meldungState.mandate.filter(m => (m.name || '').trim().length > 0).length;
+  const namenSoll = meldungState.mandate.length;
+
+  const check = (ok) => ok
+    ? '<svg class="quote-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+    : '<svg class="quote-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+
+  const items = [
+    { label: `Besetzt ${namenIst}/${namenSoll}`, ok: namenIst === namenSoll },
+    { label: `Frauen ${frauenIst}/${frauenSoll}`, ok: frauenIst >= frauenSoll },
+    { label: `U28 ${u28Ist}/${u28Soll}`, ok: u28Ist >= u28Soll },
+  ];
+
+  container.innerHTML = items.map(it =>
+    `<div class="quote-item ${it.ok ? 'ok' : 'warn'}">${check(it.ok)} ${it.label}</div>`
+  ).join('');
+}
+
+// ============================================================
+// Mail-Generation & Versand
+// ============================================================
+
+function baueMailText() {
+  const g = berechneMeldungGrundlage();
+  const heute = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  let text = '';
+  text += `Tarifgebiet: ${g.tarifgebiet || '(nicht angegeben)'}\n`;
+  text += `Stand: ${heute}\n`;
+  text += `Tarifvertragsart: ${g.typ === 'htv' ? 'Haustarifvertrag' : 'Flächentarifvertrag'}\n`;
+  text += `Mitglieder gesamt: ${g.mitgliederGesamt}\n`;
+  text += `davon Frauen: ${g.frauen} (${g.mitgliederGesamt > 0 ? (g.frauen/g.mitgliederGesamt*100).toFixed(1) : 0} %)\n`;
+  text += `davon U28: ${g.u28} (${g.mitgliederGesamt > 0 ? (g.u28/g.mitgliederGesamt*100).toFixed(1) : 0} %)\n`;
+  text += '\n';
+  text += `TK-Größe: ${g.gesamtMandate} Mandate`;
+  if (g.u28OnTop) text += ` (${g.kernMandate} Kern-TK + 2 U28 on top)`;
+  if (g.aufgeblaeht) text += ' [aufgebläht wegen Betriebsstruktur]';
+  text += '\n\n';
+
+  if (meldungState.abweichung) {
+    text += '=== ACHTUNG: ABWEICHUNG VOM BESCHLUSS ===\n';
+    text += 'Ein Beschluss des Landesfachbereichsvorstands zur abweichenden Mandatsverteilung ist erforderlich.\n';
+    text += 'Bitte an die zuständigen Verwaltungsangestellten weiterleiten.\n\n';
+    const begr = document.getElementById('abweichung-begruendung').value.trim();
+    text += `Begründung:\n${begr || '(keine Begründung angegeben)'}\n\n`;
+  }
+
+  text += '=== BESETZUNG DER TARIFKOMMISSION ===\n\n';
+
+  // Nach Betrieben gruppieren
+  const gruppen = {};
+  meldungState.mandate.forEach(m => {
+    const key = m.onTop ? '__ontop__' : (m.betrieb || 'Kern-TK');
+    if (!gruppen[key]) gruppen[key] = [];
+    gruppen[key].push(m);
+  });
+
+  Object.entries(gruppen).forEach(([key, mandate]) => {
+    if (key === '__ontop__') {
+      text += `\n-- Jugendmandate (on top) --\n`;
+    } else {
+      text += `\n-- ${key} --\n`;
+    }
+    mandate.forEach((m, i) => {
+      const kennz = [];
+      if (m.frau) kennz.push('Frau');
+      if (m.u28) kennz.push('U28');
+      const kennzStr = kennz.length > 0 ? ` [${kennz.join(', ')}]` : '';
+      const nr = m.mitgliedsnr ? ` (Mitgl.-Nr. ${m.mitgliedsnr})` : ' (Mitgl.-Nr. fehlt)';
+      const name = m.name || '(offen)';
+      let betriebZusatz = '';
+      if (m.onTop && m.betrieb) betriebZusatz = ` – Betrieb: ${m.betrieb}`;
+      text += `${i+1}. ${name}${nr}${kennzStr}${betriebZusatz}\n`;
+    });
+  });
+
+  text += '\n---\nErstellt mit dem TK-Rechner Fachbereich B SAT\n';
+  return text;
+}
+
+function mailtoSenden() {
+  const g = berechneMeldungGrundlage();
+  const betreff = `Tarifkommission ${g.tarifgebiet || '(Tarifgebiet)'} – Meldung`
+    + (meldungState.abweichung ? ' [Abweichung/Beschluss LFBV nötig]' : '');
+  const body = baueMailText();
+  const mailto = `mailto:fb-b.sat@verdi.de?subject=${encodeURIComponent(betreff)}&body=${encodeURIComponent(body)}`;
+
+  // Länge prüfen
+  if (mailto.length > 1900) {
+    document.getElementById('mailto-hinweis').style.display = 'block';
+    alert('Die Zusammensetzung ist recht umfangreich – die Mail könnte im Mail-Client abgeschnitten werden.\n\nEmpfehlung: „Text in Zwischenablage kopieren" nutzen und die Mail selbst schreiben.');
+  }
+  window.location.href = mailto;
+  setTimeout(() => {
+    document.getElementById('mailto-hinweis').style.display = 'block';
+  }, 500);
+}
+
+function zwischenablageKopieren() {
+  const g = berechneMeldungGrundlage();
+  const betreff = `Tarifkommission ${g.tarifgebiet || '(Tarifgebiet)'} – Meldung`
+    + (meldungState.abweichung ? ' [Abweichung/Beschluss LFBV nötig]' : '');
+  const text = `An: fb-b.sat@verdi.de\nBetreff: ${betreff}\n\n${baueMailText()}`;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(
+      () => alert('In Zwischenablage kopiert. Du kannst den Text jetzt in eine neue Mail einfügen.'),
+      () => fallbackKopieren(text)
+    );
+  } else {
+    fallbackKopieren(text);
+  }
+}
+
+function fallbackKopieren(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.top = '-1000px';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    alert('In Zwischenablage kopiert.');
+  } catch (e) {
+    alert('Kopieren fehlgeschlagen. Bitte den Text manuell markieren.');
+  }
+  document.body.removeChild(ta);
+}
 </script>
 
 </body>
